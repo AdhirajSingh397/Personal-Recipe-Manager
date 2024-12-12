@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import  { JWT_SECRET }  from "../config/config";
+import { JWT_SECRET } from "../config/config";
+//JWT secret as string?
 
 export const register = async (
   req: Request,
@@ -19,7 +20,9 @@ export const register = async (
 
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
-      res.status(400).json({ error: "User with this email or username already exists" });
+      res
+        .status(400)
+        .json({ error: "User with this email or username already exists" });
       return;
     }
 
@@ -46,41 +49,40 @@ export const register = async (
 };
 
 export const login = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const { email, password } = req.body;
-  
-      if (!email || !password) {
-        res.status(400).json({ error: "Invalid Fields" });
-        return;
-      }
-  
-      const user = await User.findOne({ email });
-      if (!user) {
-        res.status(400).json({ error: "User does not exist" });
-        return;
-      }
-  
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        res.status(400).json({ error: "Invalid credentials." });
-        return;
-      }
-  
-      const token = jwt.sign(
-        { userId: user._id, email: user.email },
-        JWT_SECRET,
-        {
-          expiresIn: "1d",
-        }
-      );
-  
-      res.status(200).json({ message: "Login successful", token });
-    } catch (error) {
-      next(error); // Pass errors to Express error handler
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({ error: "Invalid Fields" });
+      return;
     }
-  };
-  
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(400).json({ error: "User does not exist" });
+      return;
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      res.status(400).json({ error: "Invalid credentials." });
+      return;
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+
+    res.status(200).json({ message: "Login successful", token });
+  } catch (error) {
+    next(error); // Pass errors to Express error handler
+  }
+};

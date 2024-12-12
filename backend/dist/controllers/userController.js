@@ -17,6 +17,7 @@ const User_1 = require("../models/User");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../config/config");
+//JWT secret as string?
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { username, email, password } = req.body;
@@ -26,7 +27,9 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         }
         const existingUser = yield User_1.User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
-            res.status(400).json({ error: "User with this email or username already exists" });
+            res
+                .status(400)
+                .json({ error: "User with this email or username already exists" });
             return;
         }
         const hashedPassword = yield bcrypt_1.default.hash(password, 10);

@@ -14,7 +14,6 @@ app.use(express_1.default.json());
 // Use routes
 app.use("/api/users", userRoutes_1.default);
 const MONGO_URI = process.env.MONGO_URI || "your-default-mongodb-uri";
-console.log("MONGO_URI:", MONGO_URI);
 // Connect to MongoDB
 mongoose_1.default
     .connect(MONGO_URI)
